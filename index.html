@@ -78,6 +78,8 @@ h1 i{font-style:normal;color:var(--red);display:inline-block;animation:wig 1.2s 
 .st.at{transform:rotate(-1.2deg)}
 .st.at .v{font-size:20px;color:var(--blue)}
 
+.st.wx{grid-column:1 / -1;transform:rotate(1deg);margin-top:4px}
+.st.wx .v{font-size:26px}
 .err{font-size:18px;color:var(--red);text-align:center}
 .foot{display:flex;justify-content:center;margin-top:8px}
 .refresh{font:inherit;font-size:16px;color:var(--pen);background:#fff;border:2.5px solid var(--pen);border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--pen);transform:rotate(1deg)}
@@ -163,6 +165,7 @@ h1 i{font-style:normal;color:var(--red);display:inline-block;animation:wig 1.2s 
     <div class="st min"><span class="k">집 앞까지</span><span class="v" id="min">…</span><span class="go" id="go"></span></div>
     <div class="st cnt"><span class="k">남은 정거장</span><span class="v" id="cnt">-</span></div>
     <div class="st at"><span class="k">버스 지금</span><span class="v" id="at">-</span></div>
+    <div class="st wx" id="wx" hidden><span class="k">오늘 날씨</span><span class="v" id="wxLine">-</span></div>
   </section>
 
   <div class="err" id="err" hidden></div>
@@ -257,8 +260,24 @@ function render(items){
   moveBus(soon ? ROAD_END : ROAD_START + (ROAD_END - ROAD_START) * k / MAX_STOPS);
 }
 
+/* 날씨 (Open-Meteo, 키 필요 없음) */
+const LAT = 36.378, LON = 127.304;
+let wxAt = 0;
+async function loadWeather(){
+  if (Date.now() - wxAt < 10 * 60 * 1000) return;   // 10분에 한 번만
+  try {
+    const u = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m&daily=temperature_2m_max&timezone=Asia%2FSeoul&forecast_days=1`;
+    const d = await (await fetch(u)).json();
+    const now = Math.round(d.current.temperature_2m), max = Math.round(d.daily.temperature_2m_max[0]);
+    $('wxLine').textContent = `지금 ${now}° / 낮 최고 ${max}°`;
+    $('wx').hidden = false;
+    wxAt = Date.now();
+  } catch(e) {}
+}
+
 let busy = false;
 async function load(){
+  loadWeather();
   if (busy) return; busy = true; $('refresh').classList.add('busy');
   try {
     const res = await fetch(`${API}?serviceKey=${KEY}&arsId=${STOP}`, {cache:'no-store'});
