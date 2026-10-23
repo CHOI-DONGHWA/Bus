@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="잉둑 출근">
+<meta name="theme-color" content="#fffdf2">
+<title>잉둑 출근버스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gaegu:wght@400;700&display=swap">
+<style>
+/* 레이아웃: 그림판으로 대충 그린 듯한 낙서장. 삐뚤어진 제목 → 버스가 한마디 하는 말풍선 → 부글부글 끓는 선의 길 그림 → 테이프로 붙인 정보 스티커 세 장. 일부러 한 가지 톤(흰 종이·검정 펜·빨강·형광노랑)만 씀 */
+:root{
+  --paper:#fffdf2; --pen:#141414; --red:#ff2e2e; --hl:#fff200; --blue:#2d6bff; --tape:#f3e7b3cc; --gray:#8a8a8a;
+  --f-hand:"Gaegu","Apple SD Gothic Neo","Malgun Gothic",cursive;
+  --f-fat:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--paper); color:var(--pen); font:18px/1.45 var(--f-hand); font-weight:700;
+  background-image:linear-gradient(transparent 31px,#e9e4cf 32px);background-size:100% 32px;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent; overflow-x:hidden;
+}
+main{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-block:22px 30px}
+
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px) rotate(-.4deg)}50%{transform:translate(2px,-2px)}75%{transform:translate(3px,1px) rotate(.4deg)}}
+
+h1{margin:0;font-family:var(--f-fat);font-weight:400;font-size:38px;line-height:1.15;transform:rotate(-2.5deg);transform-origin:left;align-self:flex-start;position:relative}
+h1 span{background:linear-gradient(transparent 55%,var(--hl) 55% 92%,transparent 92%);padding:0 4px}
+h1 i{font-style:normal;color:var(--red);display:inline-block;animation:wig 1.2s ease-in-out infinite}
+@keyframes wig{50%{transform:rotate(12deg) scale(1.15)}}
+
+/* 그림 */
+.scene{border:3px solid var(--pen);border-radius:14px 22px 10px 18px;background:#fff;box-shadow:5px 5px 0 var(--pen);overflow:hidden;transform:rotate(-.8deg)}
+.scene svg{display:block;width:100%;height:auto}
+#jiggle{animation:jig .3s steps(2) infinite}
+@keyframes jig{50%{transform:translate(0,-2px) rotate(-1.5deg)}}
+.sleep #jiggle{animation:none}
+.pupil{animation:look 2.2s ease-in-out infinite}
+.pupil.p2{animation-duration:1.7s}
+@keyframes look{0%,100%{transform:translate(0,0)}30%{transform:translate(1.6px,-1px)}60%{transform:translate(-1.4px,1.4px)}}
+.sweat{opacity:0}
+.panic .sweat{opacity:1;animation:drip .6s ease-in infinite}
+.panic .sweat.s2{animation-delay:.3s}
+@keyframes drip{from{transform:translate(0,0)}to{transform:translate(3px,10px);opacity:0}}
+.zz{display:none}
+.sleep .zz{display:inline}
+.sleep .tongue,.sleep .pupil{display:none}
+.lid{display:none}
+.sleep .lid{display:inline}
+.dust{animation:dust .5s linear infinite}
+.dust.d2{animation-delay:.25s}
+@keyframes dust{from{transform:translate(0,0);opacity:.9}to{transform:translate(-16px,-4px);opacity:0}}
+.sleep .dust{display:none}
+
+/* 스티커 */
+.stickers{display:grid;grid-template-columns:1.1fr 1fr;gap:14px 12px;margin-top:6px}
+.st{position:relative;background:#fff;border:3px solid var(--pen);padding:16px 14px 12px;min-width:0;box-shadow:3px 3px 0 var(--pen)}
+.st::before{content:"";position:absolute;top:-11px;left:50%;width:64px;height:20px;margin-left:-32px;background:var(--tape);border:1px solid #d9cc92;transform:rotate(-4deg)}
+.st .k{font-size:16px;color:var(--gray);display:block;line-height:1.2}
+.st .v{display:block;font-family:var(--f-fat);font-weight:400;line-height:1.05;word-break:keep-all;overflow-wrap:anywhere}
+.st.min{grid-row:span 2;transform:rotate(-2deg);background:var(--hl);display:flex;flex-direction:column;justify-content:center}
+.st.min .v{font-size:30px;color:var(--pen)}
+.st.min .v .n{font-size:92px;color:var(--red);letter-spacing:-3px;font-variant-numeric:tabular-nums;line-height:.95}
+.st.min .v .u{font-size:30px}
+.st .go{display:block;margin-top:6px;font-size:18px;line-height:1.2}
+.st .go.now{color:var(--red)}
+.st.cnt{transform:rotate(2.5deg)}
+.st.cnt .v{font-size:34px}
+.st.cnt .v small{font-size:18px}
+.st.at{transform:rotate(-1.2deg)}
+.st.at .v{font-size:20px;color:var(--blue)}
+
+.err{font-size:18px;color:var(--red);text-align:center}
+.foot{display:flex;justify-content:center;margin-top:8px}
+.refresh{font:inherit;font-size:16px;color:var(--pen);background:#fff;border:2.5px solid var(--pen);border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:2px 2px 0 var(--pen);transform:rotate(1deg)}
+.refresh:active{transform:translate(2px,2px) rotate(1deg);box-shadow:none}
+.refresh:focus-visible{outline:3px solid var(--blue)}
+.refresh.busy{animation:spinbtn .6s linear}
+@keyframes spinbtn{to{transform:rotate(361deg)}}
+
+@media (max-width:360px){h1{font-size:32px}.st.min .v .n{font-size:76px}.bubble{font-size:19px}}
+@media (prefers-reduced-motion:reduce){
+  .panic main,h1 i,#jiggle,.pupil,.panic .sweat,.dust,.refresh.busy{animation:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <h1><span>잉둑아 출근하자</span></h1>
+
+  <div class="scene" aria-hidden="true">
+    <svg viewBox="0 0 360 190">
+      <defs>
+        <filter id="boil" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1"/>
+          <feDisplacementMap in="SourceGraphic" scale="3.2"/>
+        </filter>
+      </defs>
+      <g filter="url(#boil)">
+        <!-- 해 (대충) -->
+        <circle cx="40" cy="36" r="18" fill="#ffd400" stroke="#141414" stroke-width="3"/>
+        <g stroke="#141414" stroke-width="3" stroke-linecap="round">
+          <path d="M40 8v-6M40 64v6M12 36h-6M68 36h6M20 16l-4-4M60 56l4 4M60 16l4-4M20 56l-4 4"/>
+        </g>
+        <path d="M33 34 q2 -3 4 0 M43 34 q2 -3 4 0" stroke="#141414" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M34 42 h12" stroke="#141414" stroke-width="2.4" stroke-linecap="round"/>
+
+        <!-- 길 -->
+        <path d="M0 150 H360" stroke="#141414" stroke-width="3"/>
+        <path d="M0 178 H360" stroke="#141414" stroke-width="3"/>
+        <path d="M6 164 H360" stroke="#141414" stroke-width="2.5" stroke-dasharray="14 12"/>
+        <g id="dots"></g>
+
+        <!-- 집 (대충) -->
+        <g transform="translate(316,150)">
+          <path d="M-28 -36 L2 -66 L30 -38 Z" fill="#ff2e2e" stroke="#141414" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="-22" y="-38" width="46" height="38" fill="#fff" stroke="#141414" stroke-width="3"/>
+          <rect x="-4" y="-22" width="12" height="22" fill="#141414"/>
+          <rect x="-16" y="-32" width="9" height="9" fill="#9fd3ff" stroke="#141414" stroke-width="2"/>
+          <text x="2" y="-72" font-family="Gaegu, cursive" font-weight="700" font-size="13" text-anchor="middle" fill="#141414">잉둑이네</text>
+        </g>
+
+        <!-- 버스 -->
+        <g id="bus" transform="translate(40,150)">
+          <g id="jiggle">
+            <g class="dust"><circle cx="-36" cy="-6" r="5" fill="none" stroke="#141414" stroke-width="2"/></g>
+            <g class="dust d2"><circle cx="-42" cy="-12" r="3.5" fill="none" stroke="#141414" stroke-width="2"/></g>
+            <g transform="translate(-34,-52)">
+              <path d="M4 10 Q4 2 14 2 H58 Q70 2 70 16 V40 H4 Z" fill="#ffd400" stroke="#141414" stroke-width="3" stroke-linejoin="round"/>
+              <rect x="10" y="9" width="13" height="12" fill="#9fd3ff" stroke="#141414" stroke-width="2.2"/>
+              <rect x="27" y="9" width="13" height="12" fill="#9fd3ff" stroke="#141414" stroke-width="2.2"/>
+              <!-- 짝짝이 눈 -->
+              <circle cx="51" cy="15" r="7" fill="#fff" stroke="#141414" stroke-width="2.2"/>
+              <circle cx="64" cy="17" r="4.6" fill="#fff" stroke="#141414" stroke-width="2.2"/>
+              <circle class="pupil" cx="52" cy="16" r="2.6" fill="#141414"/>
+              <circle class="pupil p2" cx="64" cy="18" r="1.8" fill="#141414"/>
+              <path class="lid" d="M44 15 h14 M60 17 h9" stroke="#141414" stroke-width="2.6" stroke-linecap="round"/>
+              <!-- 메롱 -->
+              <path d="M50 29 Q57 33 66 28" stroke="#141414" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+              <path class="tongue" d="M56 31 q1 7 5 5 q2 -2 0 -5" fill="#ff6b8b" stroke="#141414" stroke-width="1.8"/>
+              <path class="sweat" d="M72 4 q4 6 0 8 q-4 -2 0 -8z" fill="#9fd3ff" stroke="#141414" stroke-width="1.5"/>
+              <path class="sweat s2" d="M67 -2 q3 5 0 6 q-3 -1 0 -6z" fill="#9fd3ff" stroke="#141414" stroke-width="1.5"/>
+              <text x="22" y="35" font-family="Black Han Sans, sans-serif" font-size="10" fill="#141414" text-anchor="middle">1002</text>
+              <circle cx="18" cy="42" r="7" fill="#141414"/><circle cx="18" cy="42" r="2.4" fill="#fff"/>
+              <circle cx="56" cy="42" r="7" fill="#141414"/><circle cx="56" cy="42" r="2.4" fill="#fff"/>
+              <g class="zz" font-family="Gaegu, cursive" font-weight="700" fill="#141414"><text x="70" y="-2" font-size="14">z</text><text x="78" y="-12" font-size="18">Z</text></g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <section class="stickers" aria-live="polite">
+    <div class="st min"><span class="k">집 앞까지</span><span class="v" id="min">…</span><span class="go" id="go"></span></div>
+    <div class="st cnt"><span class="k">남은 정거장</span><span class="v" id="cnt">-</span></div>
+    <div class="st at"><span class="k">버스 지금</span><span class="v" id="at">-</span></div>
+  </section>
+
+  <div class="err" id="err" hidden></div>
+
+  <div class="foot"><button type="button" class="refresh" id="refresh"><span id="updated">새로고침</span></button></div>
+</main>
+
+<script>
+const API = 'https://apis.data.go.kr/6300000/arrive/getArrInfoByUid';
+const STATION_API = 'https://apis.data.go.kr/6300000/stationinfo/getStationByUid';
+const KEY = '232096fa1395dace3ffd6430c93dfc0e7a8cd9f5197e3e65ff3e3068bfe1a8b7';
+const STOP = '46450';
+const HOME = '영무예다음아파트';
+const ROUTE = '1002';
+const MAX_STOPS = 6;
+const LEAVE_BEFORE = 10;  // 버스 오기 몇 분 전에 집에서 나가야 하는지
+const ROAD_START = 40, ROAD_END = 268, ROAD_Y = 150;   // 버스가 다니는 x 구간
+
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* 그림판 선이 부글부글 끓는 효과 */
+if (!reduce) { let s = 1; setInterval(() => { s = s % 4 + 1; $('turb').setAttribute('seed', s); }, 160); }
+
+/* 버스 이동 */
+let curX = ROAD_START, animId = 0;
+function drawDots(k){
+  let h = '';
+  for (let j = 0; j < MAX_STOPS; j++) {
+    const x = ROAD_START + (ROAD_END - ROAD_START) * j / MAX_STOPS, passed = j < k;
+    h += passed
+      ? `<path d="M${x-5} ${ROAD_Y+8} l10 10 M${x+5} ${ROAD_Y+8} l-10 10" stroke="#8a8a8a" stroke-width="2.5" stroke-linecap="round"/>`
+      : `<circle cx="${x}" cy="${ROAD_Y+14}" r="5.5" fill="#ff2e2e" stroke="#141414" stroke-width="2.2"/>`;
+  }
+  $('dots').innerHTML = h;
+}
+function moveBus(tx){
+  cancelAnimationFrame(animId);
+  const from = curX, t0 = performance.now(), dur = reduce ? 0 : 1300;
+  const step = now => {
+    const t = dur ? Math.min(1, (now - t0) / dur) : 1;
+    const e = 1 - Math.pow(1 - t, 3);
+    curX = from + (tx - from) * e;
+    $('bus').setAttribute('transform', `translate(${curX.toFixed(1)},${ROAD_Y})`);
+    if (t < 1) animId = requestAnimationFrame(step);
+  };
+  animId = requestAnimationFrame(step);
+}
+drawDots(0);
+
+/* 정거장 번호 → 이름 */
+const names = (() => { try { return JSON.parse(localStorage.getItem('bus.names') || '{}'); } catch(e) { return {}; } })();
+async function stopName(id){
+  id = (id || '').trim();
+  if (!id) return '';
+  if (id === STOP) return HOME;
+  if (names[id]) return names[id];
+  try {
+    const res = await fetch(`${STATION_API}?serviceKey=${KEY}&arsId=${encodeURIComponent(id)}`, {cache:'force-cache'});
+    const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
+    const nm = xml.querySelector('BUSSTOP_NM')?.textContent?.trim();
+    if (nm) { names[id] = nm; try { localStorage.setItem('bus.names', JSON.stringify(names)); } catch(e) {} return nm; }
+  } catch(e) {}
+  return '';
+}
+
+function render(items){
+  const it = items.filter(i => i.ROUTE_NO === ROUTE).sort((a,b) => (+a.EXTIME_SEC) - (+b.EXTIME_SEC))[0];
+  const body = document.body;
+  if (!it) {
+    body.className = 'sleep';
+    $('min').textContent = '쉬는 중';
+    $('go').textContent = '';
+    $('cnt').textContent = '-';
+    $('at').textContent = '차고지에서 쉬는 중';
+    drawDots(0); moveBus(ROAD_START);
+    return;
+  }
+  const tp = it.MSG_TP, pos = Math.max(0, +it.STATUS_POS || 0), min = +it.EXTIME_MIN;
+  const garage = tp === '07';
+  const soon = !garage && (tp === '01' || tp === '06' || pos === 0 || min <= 1);
+  body.className = garage ? 'sleep' : '';
+
+  $('min').innerHTML = garage ? '출발 전' : soon ? '곧 와!' : `<span class="n">${min}</span><span class="u">분</span>`;
+  const go = min - LEAVE_BEFORE;
+  $('go').textContent = garage ? '' : go > 0 ? `${go}분 뒤에 나가면 됨` : '';
+  $('cnt').innerHTML = garage ? '-' : pos > 0 ? `${pos}<small>정거장 전</small>` : '<small>들어오는 중</small>';
+  $('at').textContent = garage ? '차고지' : (it.STOP_NAME || '달리는 중');
+
+  const k = garage ? 0 : MAX_STOPS - Math.min(pos, MAX_STOPS);
+  drawDots(k);
+  moveBus(soon ? ROAD_END : ROAD_START + (ROAD_END - ROAD_START) * k / MAX_STOPS);
+}
+
+let busy = false;
+async function load(){
+  if (busy) return; busy = true; $('refresh').classList.add('busy');
+  try {
+    const res = await fetch(`${API}?serviceKey=${KEY}&arsId=${STOP}`, {cache:'no-store'});
+    const xml = new DOMParser().parseFromString(await res.text(), 'application/xml');
+    const cd = xml.querySelector('headerCd')?.textContent?.trim();
+    const authErr = xml.querySelector('returnAuthMsg, errMsg')?.textContent;
+    if (authErr || (!cd && !res.ok)) throw new Error( '버스 정보를 못 불러왔어 (' + (authErr || res.status) + ')');
+    const items = [...xml.querySelectorAll('itemList')].map(n => {
+      const o = {}; for (const c of n.children) o[c.tagName] = c.textContent.trim(); return o;
+    });
+    // STOP_NAME은 우리집 정류장 이름이라, 실제 위치는 LAST_STOP_ID로 찾음
+    const mine = items.filter(i => i.ROUTE_NO === ROUTE);
+    await Promise.all(mine.map(async i => { i.STOP_NAME = await stopName(i.LAST_STOP_ID); }));
+    render(items);
+    $('err').hidden = true;
+    $('updated').textContent = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'}) + ' 기준 · 새로고침';
+  } catch(e) {
+    $('err').textContent = e.message === 'Failed to fetch' ? '인터넷이 잠깐 끊겼나 봐. 다시 눌러줘' : e.message;
+    $('err').hidden = false;
+  } finally {
+    busy = false;
+    setTimeout(() => $('refresh').classList.remove('busy'), 600);
+  }
+}
+
+$('refresh').addEventListener('click', load);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) load(); });
+load();
+setInterval(() => { if (!document.hidden) load(); }, 20000);
+</script>
+</body>
+</html>
